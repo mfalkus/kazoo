@@ -154,7 +154,7 @@
                         "additionalProperties": false,
                         "properties": {
                             "dynamic": {
-                                "description": "A list of properties that, if found in on the inbound call, should be added as INVITE parameters",
+                                "description": "A list of properties that, if found on the inbound call, should be added as an INVITE parameter",
                                 "items": {
                                     "oneOf": [
                                         {
