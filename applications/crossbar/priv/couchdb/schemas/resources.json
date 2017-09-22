@@ -175,9 +175,6 @@
                                             "additionalProperties": false,
                                             "properties": {
                                                 "key": {
-                                                    "type": "string"
-                                                },
-                                                "value": {
                                                     "oneOf": [
                                                         {
                                                             "pattern": "custom_channel_vars\\..*",
@@ -194,11 +191,17 @@
                                                             "type": "string"
                                                         }
                                                     ]
+                                                },
+                                                "seperator": {
+                                                    "type": "string"
+                                                },
+                                                "tag": {
+                                                    "type": "string"
                                                 }
                                             },
                                             "required": [
                                                 "key",
-                                                "value"
+                                                "tag"
                                             ],
                                             "type": "object"
                                         }
