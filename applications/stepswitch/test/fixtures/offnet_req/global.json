@@ -1,0 +1,38 @@
+{  
+   "Account-Realm":"4a6863.sip.2600hz.local",
+   "Account-ID":"account0000000000000000000000001",
+   "Application-Name":"bridge",
+   "Bypass-E164":false,
+   "B-Leg-Events":[  
+      "DTMF"
+   ],
+   "Call-ID":"82159NjBmNTI0YjQ5MTE2NmFkNmQ3NmRmYzFiYWRhMGQ0NGI",
+   "Custom-Channel-Vars":{  
+      "Caller-Screen-Bit":true,
+      "Caller-Privacy-Hide-Name":false,
+      "Caller-Privacy-Hide-Number":false
+   },
+   "Control-Queue":"ecallmgr@apps001.2600hz.local-<0.13994.30>-104ca57b",
+   "Emergency-Caller-ID-Name":"2600Hz Emergency",
+   "Emergency-Caller-ID-Number":"+14158867900",
+   "Flags":[  
+      "testing"
+   ],
+   "Format-From-URI":false,
+   "From-URI-Realm":"4a6863.sip.2600hz.local",
+   "Ignore-Early-Media":"false",
+   "Msg-ID":"4d2ed1d11808",
+   "Outbound-Caller-ID-Number":"+14158867900",
+   "Outbound-Caller-ID-Name":"2600Hz",
+   "Presence-ID":"7907@4a6863.sip.2600hz.local",
+   "Resource-Type":"audio",
+   "Fax-T38-Enabled":false,
+   "Timeout":60,
+   "To-DID":"+14158867900",
+   "Server-ID":"kazoo_apps@apps001.2600hz.local-<0.14582.68>-8ae73e72",
+   "Node":"kazoo_apps@apps001.2600hz.local",
+   "Event-Name":"offnet_req",
+   "Event-Category":"resource",
+   "App-Version":"4.0.0",
+   "App-Name":"callflow"
+}
