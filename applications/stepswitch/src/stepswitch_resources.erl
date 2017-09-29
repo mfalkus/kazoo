@@ -72,7 +72,10 @@
 
 
 -ifdef(TEST).
--export([resources_to_endpoints/3]).
+-export([sip_invite_parameters/2
+        ,gateway_from_jobj/2
+        ,resource_from_jobj/1
+        ]).
 -endif.
 
 -include("stepswitch.hrl").
