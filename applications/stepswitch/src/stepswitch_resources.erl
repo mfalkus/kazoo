@@ -73,6 +73,7 @@
 
 -ifdef(TEST).
 -export([sip_invite_parameters/2
+        ,dynamic_sip_invite_parameters/2
         ,gateway_from_jobj/2
         ,resource_from_jobj/1
         ]).
