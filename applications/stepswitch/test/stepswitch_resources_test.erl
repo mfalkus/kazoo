@@ -35,22 +35,25 @@ invite_parameters_test_() ->
     Offnet2 = kz_json:set_value([<<"Requestor-Custom-Channel-Vars">>, <<"Account-ID">>], <<"12345">>, Offnet),
     Offnet3 = kz_json:set_value([<<"Requestor-Custom-SIP-Headers">>, <<"X-Auth-IP">>], <<"127.0.0.1">>, Offnet),
 
-    %DynamicParameters1 = kz_json:from_list([{<<"key">>, <<"custom_sip_headers.x_auth_ip">>}, {<<"tag">>, <<"somethingelse">>}]),
-    %GatewayJObj2 = kz_json:set_value([<<"invite_parameters">>, <<"dynamic">>], [DynamicParameters1], GatewayJObj),
-    %Gateway2 = stepswitch_resources:gateway_from_jobj(GatewayJObj2, Resource),
+    DynamicParameters1 = kz_json:from_list([{<<"key">>, <<"custom_sip_headers.x_auth_ip">>}, {<<"tag">>, <<"somethingelse">>}]),
+    GatewayJObj2 = kz_json:set_value([<<"invite_parameters">>, <<"dynamic">>], [DynamicParameters1], GatewayJObj),
+    _Gateway2 = stepswitch_resources:gateway_from_jobj(GatewayJObj2, Resource),
 
-    %DynamicParameters2 = kz_json:from_list([{<<"key">>, <<"custom_sip_headers.x_auth_ip">>}, {<<"tag">>, <<"somethingelse">>}, {<<"seperator">>, <<"&">>}]),
-    
+    DynamicParameters2 = kz_json:from_list([{<<"key">>, <<"custom_sip_headers.x_auth_ip">>}, {<<"tag">>, <<"somethingelse">>}, {<<"seperator">>, <<"&">>}]),
+    GatewayJObj3 = kz_json:set_value([<<"invite_parameters">>, <<"dynamic">>], [DynamicParameters2], GatewayJObj),
+    Gateway3 = stepswitch_resources:gateway_from_jobj(GatewayJObj3, Resource),    
+
     Result1 = stepswitch_resources:sip_invite_parameters(Gateway, Offnet1),
     Result2 = stepswitch_resources:sip_invite_parameters(Gateway, Offnet2),
-    Result3 = stepswitch_resources:sip_invite_parameters(Gateway, Offnet3),    
-   % Result4 = stepswitch_resources:dynamic_sip_invite_parameters(Gateway2, Offnet),
-    ?debugFmt("~p~n", [Gateway]),
+    Result3 = stepswitch_resources:sip_invite_parameters(Gateway, Offnet3),
+    Result4 = stepswitch_resources:sip_invite_parameters(Gateway3, Offnet3),     
+    ?debugFmt("~p~n", [Result4]),
     
     [?_assertEqual([<<"npid">>, <<"zone=local">>, <<"cic=2002">>], Result1)
     ,?_assertEqual([<<"npid">>, <<"zone=local">>, <<"account_id=12345">>], Result2)
     ,?_assertEqual([<<"npid">>, <<"zone=local">>, <<"source_ip=127.0.0.1">>], Result3)
-    ].    
+    ,?_assertEqual([<<"npid">>, <<"somethingelse&127.0.0.1">>], Result4)
+    ]. 
 
 %    Setup = [{<<"cic=2002">>
 %             ,[<<"Requestor-Custom-Channel-Vars">>, <<"TNS-CIC">>]
