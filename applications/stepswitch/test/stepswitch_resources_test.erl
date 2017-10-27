@@ -4,7 +4,7 @@
 %%% Account document
 %%% @end
 %%% @contributors
-%%% 
+%%%
 %%%-------------------------------------------------------------------
 -module(stepswitch_resources_test).
 
@@ -17,7 +17,7 @@ check_fixtures_test_() ->
     {'ok', Schema} = kz_json_schema:fload(<<"resources">>),
     {'ok', Resources} = kz_json:fixture(?APP, <<"fixtures/resources/global.json">>),
     [{"validate resource fixture", ?_assertMatch({'ok', _}, validate(Schema, Resource))}
-    || Resource <- Resources
+     || Resource <- Resources
     ].
 
 invite_parameters_test_() ->
@@ -55,7 +55,7 @@ invite_parameters_test_() ->
     Zipped = lists:zip3(ExpectedValues, Gateways, Offnets),
 
     [?_assertEqual(ExpectedValue, stepswitch_resources:sip_invite_parameters(Gateway, ModifiedOffnet))
-    || {ExpectedValue, Gateway, ModifiedOffnet} <- Zipped].
+     || {ExpectedValue, Gateway, ModifiedOffnet} <- Zipped].
 
 validate(Schema, Object) ->
     kz_json_schema:validate(Schema
