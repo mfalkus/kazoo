@@ -278,7 +278,7 @@ enter_loop(Module, Options, ModuleState, ServerName, Timeout) ->
     gen_server:enter_loop(?MODULE, [], MyState, ServerName, Timeout).
 
 -spec add_responder(server_ref(), responder_callback(), responder_callback_mapping() | responder_callback_mappings()) -> 'ok'.
-add_responder(Srv, Responder, Key) when not is_list(Key) ->
+add_responder(Srv, Responder, {_,_}=Key) ->
     add_responder(Srv, Responder, [Key]);
 add_responder(Srv, Responder, [{_,_}|_] = Keys) ->
     gen_server:cast(Srv, {'add_responder', Responder, Keys}).
@@ -901,7 +901,8 @@ callback_handle_event(JObj
              ]
             ,NewModuleState
             };
-        {'EXIT', _Why} ->
+        {'EXIT', Why} ->
+            lager:error("CRASH in handle_event ~p", [Why]),
             [{'server', Self}
             ,{'queue', Queue}
             ,{'basic', Basic}
@@ -915,14 +916,11 @@ callback_handle_event(JObj
                                    handle_event_return() |
                                    {'EXIT', any()}.
 callback_handle_event(JObj, _, {Module, Fun, 2}, ModuleState) ->
-    try Module:Fun(JObj, ModuleState)
-    catch E:O -> lager:error("CRASH in handle_event ~p:~p", [E, O]) end;
+    catch Module:Fun(JObj, ModuleState);
 callback_handle_event(JObj, {BasicDeliver, _}, {Module, Fun, 3}, ModuleState) ->
-    try Module:Fun(JObj, BasicDeliver, ModuleState)
-    catch E:O -> lager:error("CRASH in handle_event ~p:~p", [E, O]) end;
+    catch Module:Fun(JObj, BasicDeliver, ModuleState);
 callback_handle_event(JObj, {BasicDeliver, Basic}, {Module, Fun, 4}, ModuleState) ->
-    try Module:Fun(JObj, BasicDeliver, Basic, ModuleState)
-    catch E:O -> lager:error("CRASH in handle_event ~p:~p", [E, O]) end;
+    catch Module:Fun(JObj, BasicDeliver, Basic, ModuleState);
 callback_handle_event(_, _, _, _) ->
     {'EXIT', 'not_exported'}.
 

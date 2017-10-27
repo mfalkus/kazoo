@@ -18,7 +18,7 @@
 
         ,retention_days/1
         ,retention_seconds/0, retention_seconds/1
-        ,maybe_set_deleted_by_retention/1, maybe_set_deleted_by_retention/2
+        ,enforce_retention/1, enforce_retention/2
 
         ,publish_saved_notify/5, publish_voicemail_saved/5
         ,get_notify_completed_message/1
@@ -61,7 +61,7 @@ get_range_db(AccountId) ->
     get_range_db(AccountId, retention_days(AccountId)).
 
 get_range_db(AccountId, Days) ->
-    To = kz_time:current_tstamp(),
+    To = kz_time:now_s(),
     From = To - retention_seconds(Days),
     lists:reverse([Db || Db <- kazoo_modb:get_range(AccountId, From, To)]).
 
@@ -132,11 +132,11 @@ check_msg_belonging(_BoxId, _JObj, _SourceId) ->
 %% @doc
 %% @end
 %%--------------------------------------------------------------------
--spec retention_seconds() -> integer().
+-spec retention_seconds() -> gregorian_seconds().
 retention_seconds() ->
     retention_seconds(?RETENTION_DAYS).
 
--spec retention_seconds(integer() | api_binary()) -> integer().
+-spec retention_seconds(integer() | api_binary()) -> gregorian_seconds().
 retention_seconds(Days) when is_integer(Days)
                              andalso Days > 0 ->
     ?SECONDS_IN_DAY * Days + ?SECONDS_IN_HOUR;
@@ -158,12 +158,12 @@ retention_days(AccountId) ->
 %% if message is older than retention duration, set folder to deleted
 %% @end
 %%--------------------------------------------------------------------
--spec maybe_set_deleted_by_retention(kz_json:object()) -> kz_json:object().
--spec maybe_set_deleted_by_retention(kz_json:object(), integer()) -> kz_json:object().
-maybe_set_deleted_by_retention(JObj) ->
-    maybe_set_deleted_by_retention(JObj, retention_seconds()).
+-spec enforce_retention(kz_json:object()) -> kz_json:object().
+-spec enforce_retention(kz_json:object(), integer()) -> kz_json:object().
+enforce_retention(JObj) ->
+    enforce_retention(JObj, retention_seconds()).
 
-maybe_set_deleted_by_retention(JObj, Timestamp) ->
+enforce_retention(JObj, Timestamp) ->
     TsTampPath = [<<"utc_seconds">>, <<"timestamp">>],
     MsgTstamp = kz_term:to_integer(kz_json:get_first_defined(TsTampPath, JObj, 0)),
     case MsgTstamp =/= 0
@@ -186,7 +186,7 @@ get_change_vmbox_funs(AccountId, NewBoxId, NBoxJ, OldBoxId) ->
 -spec get_change_vmbox_funs(ne_binary(), ne_binary(), kz_json:object(), ne_binary(), api_binary()) ->
                                    {ne_binary(), update_funs()}.
 get_change_vmbox_funs(AccountId, NewBoxId, NBoxJ, OldBoxId, ToId) ->
-    Timestamp = kz_time:current_tstamp(),
+    Timestamp = kz_time:now_s(),
     {{Y, M, _}, _} = calendar:gregorian_seconds_to_datetime(Timestamp),
     Year = kz_term:to_binary(Y),
     Month = kz_date:pad_month(M),
@@ -267,7 +267,7 @@ publish_saved_notify(MediaId, BoxId, Call, Length, Props) ->
                  ,{<<"Voicemail-ID">>, MediaId}
                  ,{<<"Caller-ID-Number">>, get_caller_id_number(Call)}
                  ,{<<"Caller-ID-Name">>, get_caller_id_name(Call)}
-                 ,{<<"Voicemail-Timestamp">>, kz_time:current_tstamp()}
+                 ,{<<"Voicemail-Timestamp">>, kz_time:now_s()}
                  ,{<<"Voicemail-Length">>, Length}
                  ,{<<"Voicemail-Transcription">>, Transcription}
                  ,{<<"Call-ID">>, kapps_call:call_id_direct(Call)}

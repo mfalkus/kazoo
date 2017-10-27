@@ -2159,6 +2159,7 @@
                     "default": "park",
                     "description": "Action to take for the caller",
                     "enum": [
+                        "direct_park",
                         "park",
                         "retrieve",
                         "auto"
@@ -2426,7 +2427,7 @@
                 "time_limit": {
                     "default": 3600,
                     "description": "Time limit, in seconds, for the recording",
-                    "maximum": 3600,
+                    "maximum": 10800,
                     "minimum": 5,
                     "type": "integer"
                 },
@@ -2675,6 +2676,54 @@
                 "action",
                 "callflow_id"
             ],
+            "type": "object"
+        },
+        "callflows.route_to_cid": {
+            "description": "Endpoints lookup by cid number",
+            "properties": {
+                "can_call_self": {
+                    "description": "Toggle whether devices of the same owner can call each other",
+                    "type": "boolean"
+                },
+                "can_text_self": {
+                    "description": "Toggle whether devices of the same owner can text each other",
+                    "type": "boolean"
+                },
+                "cid_types": {
+                    "default": [
+                        "internal"
+                    ],
+                    "description": "CID types to perform search: internal, external, custom",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                },
+                "delay": {
+                    "default": 0,
+                    "description": "How long to delay ringing the device, in seconds",
+                    "type": "integer"
+                },
+                "endpoint_types": {
+                    "default": [],
+                    "description": "Endpoint types to perform search: user, device",
+                    "type": "array"
+                },
+                "static_invite": {
+                    "description": "Override the SIP Username",
+                    "type": "string"
+                },
+                "suppress_clid": {
+                    "description": "Suppress sending caller ID",
+                    "type": "boolean"
+                },
+                "timeout": {
+                    "default": 0,
+                    "description": "Time, in seconds, to wait for device to bridge",
+                    "type": "integer"
+                }
+            },
             "type": "object"
         },
         "callflows.send_dtmf": {
@@ -8731,10 +8780,16 @@
                     "type": "string"
                 },
                 "Other-Participant": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "integer"
+                    ]
                 },
                 "Participant-ID": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "integer"
+                    ]
                 },
                 "Relationship": {
                     "enum": [
@@ -15262,6 +15317,9 @@
                 "HTML": {
                     "type": "string"
                 },
+                "Metadata": {
+                    "type": "string"
+                },
                 "Preview": {
                     "type": "string"
                 },
@@ -18012,6 +18070,78 @@
             },
             "required": [
                 "Token-ID"
+            ],
+            "type": "object"
+        },
+        "kapi.qubicle_session.create_session": {
+            "description": "AMQP API for qubicle_session.create_session",
+            "properties": {
+                "Account-ID": {
+                    "type": "string"
+                },
+                "Call": {
+                    "type": "object"
+                },
+                "Call-ID": {
+                    "type": "string"
+                },
+                "Session-Type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Account-ID",
+                "Call",
+                "Call-ID",
+                "Session-Type"
+            ],
+            "type": "object"
+        },
+        "kapi.qubicle_session.delete_session": {
+            "description": "AMQP API for qubicle_session.delete_session",
+            "properties": {
+                "Account-ID": {
+                    "type": "string"
+                },
+                "Call": {
+                    "type": "object"
+                },
+                "Call-ID": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Account-ID",
+                "Call",
+                "Call-ID"
+            ],
+            "type": "object"
+        },
+        "kapi.qubicle_session.join_queue": {
+            "description": "AMQP API for qubicle_session.join_queue",
+            "properties": {
+                "Account-ID": {
+                    "type": "string"
+                },
+                "Call": {
+                    "type": "object"
+                },
+                "Call-ID": {
+                    "type": "string"
+                },
+                "Join-Queue-ID": {
+                    "type": "string"
+                },
+                "Session-ID": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Account-ID",
+                "Call",
+                "Call-ID",
+                "Join-Queue-ID",
+                "Session-ID"
             ],
             "type": "object"
         },
@@ -21683,6 +21813,7 @@
                     "type": "object"
                 },
                 "data": {
+                    "default": {},
                     "description": "The data/arguments of the metaflow module",
                     "type": "object"
                 },
@@ -21695,283 +21826,6 @@
             },
             "required": [
                 "module"
-            ],
-            "type": "object"
-        },
-        "metaflow.audio_level": {
-            "description": "audio_level metaflow schema",
-            "properties": {
-                "action": {
-                    "type": "string"
-                },
-                "level": {
-                    "type": "string"
-                },
-                "mode": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "action"
-            ],
-            "type": "object"
-        },
-        "metaflow.break": {
-            "description": "break metaflow schema",
-            "properties": {},
-            "type": "object"
-        },
-        "metaflow.callflow": {
-            "description": "callflow metaflow schema",
-            "properties": {
-                "id": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "metaflow.hangup": {
-            "description": "hangup metaflow schema",
-            "properties": {},
-            "type": "object"
-        },
-        "metaflow.hold": {
-            "description": "hold metaflow schema",
-            "properties": {
-                "moh_aleg": {
-                    "type": "string"
-                },
-                "moh_bleg": {
-                    "type": "string"
-                },
-                "unhold_key": {
-                    "default": "1",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "metaflow.hold_control": {
-            "description": "hold_control metaflow schema",
-            "properties": {
-                "action": {
-                    "default": "toggle",
-                    "enum": [
-                        "hold",
-                        "unhold",
-                        "toggle"
-                    ]
-                }
-            },
-            "type": "object"
-        },
-        "metaflow.intercept": {
-            "description": "intercept metaflow schema",
-            "properties": {
-                "auto_answer": {
-                    "default": false,
-                    "type": "boolean"
-                },
-                "target_id": {
-                    "type": "string"
-                },
-                "target_type": {
-                    "enum": [
-                        "device",
-                        "user",
-                        "number"
-                    ]
-                },
-                "unbridged_only": {
-                    "default": true,
-                    "type": "boolean"
-                }
-            },
-            "required": [
-                "target_type",
-                "target_id"
-            ],
-            "type": "object"
-        },
-        "metaflow.move": {
-            "description": "move metaflow schema",
-            "properties": {
-                "auto_answer": {
-                    "default": false,
-                    "type": "boolean"
-                },
-                "device_id": {
-                    "type": "string"
-                },
-                "dial_strategy": {
-                    "enum": [
-                        "single",
-                        "simultaneous"
-                    ],
-                    "type": "string"
-                },
-                "owner_id": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "metaflow.play": {
-            "description": "play metaflow schema",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "leg": {
-                    "default": "both",
-                    "enum": [
-                        "both",
-                        "self",
-                        "peer"
-                    ]
-                }
-            },
-            "required": [
-                "id"
-            ],
-            "type": "object"
-        },
-        "metaflow.record_call": {
-            "description": "record_call metaflow schema",
-            "properties": {
-                "action": {
-                    "default": "toggle",
-                    "enum": [
-                        "start",
-                        "stop",
-                        "toggle"
-                    ]
-                },
-                "format": {
-                    "type": "string"
-                },
-                "media_name": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "action"
-            ],
-            "type": "object"
-        },
-        "metaflow.resume": {
-            "description": "resume metaflow schema",
-            "properties": {},
-            "type": "object"
-        },
-        "metaflow.say": {
-            "description": "say metaflow schema",
-            "properties": {
-                "language": {
-                    "type": "string"
-                },
-                "method": {
-                    "type": "string"
-                },
-                "text": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "text"
-            ],
-            "type": "object"
-        },
-        "metaflow.sound_touch": {
-            "description": "sound_touch metaflow schema",
-            "properties": {
-                "action": {
-                    "enum": [
-                        "start",
-                        "stop"
-                    ]
-                },
-                "adjust_in_octaves": {
-                    "type": "integer"
-                },
-                "adjust_in_semitones": {
-                    "type": "integer"
-                },
-                "hook_dtmf": {
-                    "default": false,
-                    "type": "boolean"
-                },
-                "pitch": {
-                    "type": "integer"
-                },
-                "rate": {
-                    "type": "integer"
-                },
-                "sending_leg": {
-                    "default": false,
-                    "type": "boolean"
-                },
-                "tempo": {
-                    "type": "integer"
-                }
-            },
-            "required": [
-                "action"
-            ],
-            "type": "object"
-        },
-        "metaflow.transfer": {
-            "description": "transfer metaflow schema",
-            "properties": {
-                "Transfer-Type": {
-                    "default": "attended",
-                    "enum": [
-                        "attended",
-                        "blind"
-                    ]
-                },
-                "captures": {
-                    "type": "string"
-                },
-                "target": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "metaflow.tts": {
-            "description": "tts metaflow schema",
-            "properties": {
-                "engine": {
-                    "default": "flite",
-                    "type": "string"
-                },
-                "language": {
-                    "type": "string"
-                },
-                "leg": {
-                    "default": "self",
-                    "enum": [
-                        "self",
-                        "peer"
-                    ]
-                },
-                "terminators": {
-                    "type": "string"
-                },
-                "text": {
-                    "type": "string"
-                },
-                "voice": {
-                    "default": "female",
-                    "type": "string"
-                }
-            },
-            "required": [
-                "text"
             ],
             "type": "object"
         },
@@ -22261,6 +22115,45 @@
                     "type": "string"
                 }
             },
+            "type": "object"
+        },
+        "metaflows.relate": {
+            "description": "Relate two participants to each other in a conference",
+            "properties": {
+                "conference_id": {
+                    "description": "The ID of the conference",
+                    "type": "string"
+                },
+                "other_participant": {
+                    "description": "The other participant ID to relate",
+                    "type": [
+                        "string",
+                        "integer"
+                    ]
+                },
+                "participant_id": {
+                    "description": "The participant ID to relate",
+                    "type": [
+                        "string",
+                        "integer"
+                    ]
+                },
+                "relationship": {
+                    "default": "clear",
+                    "description": "The relationship to establish between the two participants",
+                    "enum": [
+                        "deaf",
+                        "clear",
+                        "mute"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "participant_id",
+                "other_participant",
+                "conference_id"
+            ],
             "type": "object"
         },
         "metaflows.resume": {
@@ -24429,21 +24322,24 @@
                 },
                 "manual_recurring": {
                     "description": "Monthly recurring items",
-                    "properties": {
-                        "name": {
-                            "description": "A friendly name for the item",
-                            "type": "string"
+                    "items": {
+                        "properties": {
+                            "name": {
+                                "description": "A friendly name for the item",
+                                "type": "string"
+                            },
+                            "quantity": {
+                                "description": "How many of the item are allowed",
+                                "type": "integer"
+                            },
+                            "rates": {
+                                "description": "Item's rate",
+                                "type": "number"
+                            }
                         },
-                        "quantity": {
-                            "description": "How many of the item are allowed",
-                            "type": "integer"
-                        },
-                        "rates": {
-                            "description": "Item's rate",
-                            "type": "number"
-                        }
+                        "type": "object"
                     },
-                    "type": "object"
+                    "type": "array"
                 },
                 "name": {
                     "description": "A friendly name for the service plan",
@@ -24549,13 +24445,16 @@
                     "properties": {
                         "bucket": {
                             "description": "Bucket name to store data to",
+                            "maxLength": 63,
+                            "minLength": 6,
+                            "pattern": "^[^\\s]*$",
                             "type": "string"
                         },
                         "bucket_access_method": {
                             "description": "how to access the host.",
                             "enum": [
                                 "auto",
-                                "host",
+                                "vhost",
                                 "path"
                             ],
                             "type": "string"
@@ -24565,11 +24464,16 @@
                             "type": "boolean"
                         },
                         "host": {
-                            "description": "the s3 host",
+                            "description": "the s3 host, leave empty for default",
+                            "minLength": 1,
+                            "pattern": "^[^\\s]*$",
                             "type": "string"
                         },
                         "key": {
                             "description": "AWS Key to use",
+                            "maxLength": 128,
+                            "minLength": 1,
+                            "pattern": "^[^\\s]*$",
                             "type": "string"
                         },
                         "port": {
@@ -24578,6 +24482,8 @@
                         },
                         "region": {
                             "description": "the region where the bucket is located",
+                            "minLength": 1,
+                            "pattern": "^[^\\s]*$",
                             "type": "string"
                         },
                         "scheme": {
@@ -24590,6 +24496,9 @@
                         },
                         "secret": {
                             "description": "AWS Secret to use",
+                            "maxLength": 128,
+                            "minLength": 1,
+                            "pattern": "^[^\\s]*$",
                             "type": "string"
                         }
                     },
@@ -25764,6 +25673,12 @@
                     "description": "crossbar ip",
                     "type": "string"
                 },
+                "load_view_chunk_size": {
+                    "default": 50,
+                    "description": "crossbar load_view_chunk_size",
+                    "minimum": 1,
+                    "type": "integer"
+                },
                 "magic_path_patterns": {
                     "default": [
                         "/:version/accounts/:account_id/vmboxes/:box_id/messages/:message_id/raw",
@@ -25945,6 +25860,7 @@
                 "maximum_bulk": {
                     "default": 50,
                     "description": "The maximum number of call stats to load in a request",
+                    "minimum": 1,
                     "type": "integer"
                 },
                 "maximum_range": {
@@ -26069,6 +25985,18 @@
             },
             "type": "object"
         },
+        "system_config.crossbar.call_inspector": {
+            "description": "Schema for crossbar.call_inspector system_config",
+            "properties": {
+                "maximum_bulk": {
+                    "default": 50,
+                    "description": "crossbar call_inspector maximum_bulk",
+                    "minimum": 1,
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
         "system_config.crossbar.callflows": {
             "description": "Schema for crossbar.callflows system_config",
             "properties": {
@@ -26091,6 +26019,7 @@
                 "maximum_bulk": {
                     "default": 50,
                     "description": "crossbar.cdrs maximum bulk",
+                    "minimum": 1,
                     "type": "integer"
                 },
                 "maximum_range": {
@@ -27948,54 +27877,6 @@
             },
             "type": "object"
         },
-        "system_config.notification.fax_inbound_error_to_email_filtered": {
-            "description": "Schema for notification.fax_inbound_error_to_email_filtered system_config",
-            "properties": {
-                "filter_error_codes": {
-                    "default": [
-                        "0",
-                        "49"
-                    ],
-                    "description": "notification fax_inbound_error_to_email_filtered filter_error_codes",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                }
-            },
-            "type": "object"
-        },
-        "system_config.notification.port_request_admin": {
-            "description": "Schema for notification.port_request_admin system_config",
-            "properties": {
-                "default_to": {
-                    "description": "notification port_request_admin default_to",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": [
-                        "string",
-                        "array"
-                    ]
-                }
-            },
-            "type": "object"
-        },
-        "system_config.notification.system_alert": {
-            "description": "Schema for notification.system_alert system_config",
-            "properties": {
-                "enable_email_alerts": {
-                    "default": true,
-                    "description": "notification system_alert enable_email_alerts",
-                    "type": "boolean"
-                },
-                "subscriber_url": {
-                    "description": "notification system_alert subscriber_url",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
         "system_config.notify": {
             "description": "Schema for notify system_config",
             "properties": {
@@ -29146,6 +29027,17 @@
             },
             "type": "object"
         },
+        "system_config.qubicle": {
+            "description": "Schema for qubicle system_config",
+            "properties": {
+                "enable_event_call_props": {
+                    "default": false,
+                    "description": "qubicle enable_event_call_props",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
         "system_config.registrar": {
             "description": "Schema for registrar system_config",
             "properties": {
@@ -29239,12 +29131,6 @@
                     "description": "allow resellers configure bookkeeper for children billing",
                     "type": "boolean"
                 },
-                "scan_rate": {
-                    "default": 20000,
-                    "description": "services scan rate",
-                    "minimum": 0,
-                    "type": "integer"
-                },
                 "should_save_master_audit_logs": {
                     "default": false,
                     "description": "services should save master audit logs",
@@ -29253,17 +29139,6 @@
                 "support_billing_id": {
                     "default": true,
                     "description": "services support billing id",
-                    "type": "boolean"
-                },
-                "sync_buffer_period": {
-                    "default": 600,
-                    "description": "services sync buffer period",
-                    "minimum": 0,
-                    "type": "integer"
-                },
-                "sync_services": {
-                    "default": false,
-                    "description": "services sync services",
                     "type": "boolean"
                 }
             },
@@ -29752,6 +29627,12 @@
                     "minimum": 0,
                     "type": "integer"
                 },
+                "scan_rate": {
+                    "default": 20000,
+                    "description": "tasks scan_rate",
+                    "minimum": 0,
+                    "type": "integer"
+                },
                 "send_progress_after_processed": {
                     "default": 1000,
                     "description": "tasks send progress after processed",
@@ -29777,6 +29658,22 @@
                     "default": 10000,
                     "description": "tasks soft delete pause in milliseconds",
                     "type": "integer"
+                },
+                "support_billing_id": {
+                    "default": true,
+                    "description": "tasks support_billing_id",
+                    "type": "boolean"
+                },
+                "sync_buffer_period": {
+                    "default": 600,
+                    "description": "tasks sync_buffer_period",
+                    "minimum": 0,
+                    "type": "integer"
+                },
+                "sync_services": {
+                    "default": false,
+                    "description": "tasks sync_services",
+                    "type": "boolean"
                 },
                 "unfinished_port_request_lifetime_s": {
                     "default": 2592000,
@@ -39516,112 +39413,6 @@
                     },
                     {
                         "$ref": "#/parameters/ATTEMPT_ID"
-                    },
-                    {
-                        "$ref": "#/parameters/ACCOUNT_ID"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "request succeeded"
-                    }
-                }
-            }
-        },
-        "/accounts/{ACCOUNT_ID}/service_planner": {
-            "get": {
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/auth_token_header"
-                    },
-                    {
-                        "$ref": "#/parameters/ACCOUNT_ID"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "request succeeded"
-                    }
-                }
-            },
-            "put": {
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/auth_token_header"
-                    },
-                    {
-                        "$ref": "#/parameters/ACCOUNT_ID"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "request succeeded"
-                    }
-                }
-            }
-        },
-        "/accounts/{ACCOUNT_ID}/service_planner/{PLAN_ID}": {
-            "delete": {
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/auth_token_header"
-                    },
-                    {
-                        "$ref": "#/parameters/PLAN_ID"
-                    },
-                    {
-                        "$ref": "#/parameters/ACCOUNT_ID"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "request succeeded"
-                    }
-                }
-            },
-            "get": {
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/auth_token_header"
-                    },
-                    {
-                        "$ref": "#/parameters/PLAN_ID"
-                    },
-                    {
-                        "$ref": "#/parameters/ACCOUNT_ID"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "request succeeded"
-                    }
-                }
-            },
-            "patch": {
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/auth_token_header"
-                    },
-                    {
-                        "$ref": "#/parameters/PLAN_ID"
-                    },
-                    {
-                        "$ref": "#/parameters/ACCOUNT_ID"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "request succeeded"
-                    }
-                }
-            },
-            "post": {
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/auth_token_header"
-                    },
-                    {
-                        "$ref": "#/parameters/PLAN_ID"
                     },
                     {
                         "$ref": "#/parameters/ACCOUNT_ID"

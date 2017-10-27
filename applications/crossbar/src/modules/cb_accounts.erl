@@ -1402,7 +1402,7 @@ maybe_set_trial_expires(JObj) ->
 -spec set_trial_expires(kz_json:object()) -> kz_json:object().
 set_trial_expires(JObj) ->
     TrialTime = kapps_config:get_integer(?ACCOUNTS_CONFIG_CAT, <<"trial_time">>, ?SECONDS_IN_DAY * 14),
-    Expires = kz_time:current_tstamp() + TrialTime,
+    Expires = kz_time:now_s() + TrialTime,
     kz_account:set_trial_expiration(JObj, Expires).
 
 
@@ -1626,12 +1626,12 @@ delete_mod_dbs(AccountId, Year, Month) ->
 delete_remove_from_accounts(Context) ->
     case kz_datamgr:open_doc(?KZ_ACCOUNTS_DB, cb_context:account_id(Context)) of
         {'ok', JObj} ->
-            crossbar_doc:delete(
-              cb_context:setters(Context
-                                ,[{fun cb_context:set_account_db/2, ?KZ_ACCOUNTS_DB}
-                                 ,{fun cb_context:set_doc/2, JObj}
-                                 ])
-             );
+            UpdatedContext = cb_context:setters(Context
+                                               ,[{fun cb_context:set_account_db/2, ?KZ_ACCOUNTS_DB}
+                                                ,{fun cb_context:set_doc/2, JObj}
+                                                ]),
+            crossbar_doc:delete(UpdatedContext);
+
         {'error', 'not_found'} ->
             crossbar_util:response(kz_json:new(), Context);
         {'error', _R} ->

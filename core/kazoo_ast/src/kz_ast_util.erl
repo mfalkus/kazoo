@@ -8,7 +8,7 @@
         ,binary_match_to_binary/1
         ,smash_snake/1
 
-        ,schema_path/1
+        ,schema_path/1, schema_path/2
         ,api_path/1
         ,ensure_file_exists/1
         ,create_schema/1
@@ -125,8 +125,11 @@ format_name_part(Part) ->
     kz_binary:ucfirst(Part).
 
 -spec schema_path(binary()) -> file:filename_all().
+-spec schema_path(binary(), file:filename_all()) -> file:filename_all().
 schema_path(Base) ->
-    case filename:join([code:priv_dir('crossbar')
+    schema_path(Base, code:priv_dir('crossbar')).
+schema_path(Base, PrivDir) ->
+    case filename:join([PrivDir
                        ,<<"couchdb">>
                        ,<<"schemas">>
                        ,Base
@@ -308,7 +311,7 @@ property_to_row(SchemaJObj, Names, Settings, {Table, Refs}) ->
         end,
 
     maybe_sub_properties_to_row(SchemaJObj
-                               ,kz_json:get_ne_binary_value(<<"type">>, Settings)
+                               ,kz_json:get_value(<<"type">>, Settings)
                                ,Names
                                ,Settings
                                ,{[?TABLE_ROW(cell_wrap(kz_binary:join(Names, <<".">>))
@@ -482,6 +485,11 @@ maybe_sub_properties_to_row(SchemaJObj, <<"array">>, Names, Settings, {Table, Re
             };
         _Type -> {Table, Refs}
     end;
+maybe_sub_properties_to_row(SchemaJObj, [_|_]=Types, Names, Settings, Acc) ->
+    lists:foldl(fun(Type, Acc0) -> maybe_sub_properties_to_row(SchemaJObj, Type, Names, Settings, Acc0) end
+               ,Acc
+               ,Types
+               );
 maybe_sub_properties_to_row(_SchemaJObj, _Type, _Keys, _Settings, Acc) ->
     Acc.
 
